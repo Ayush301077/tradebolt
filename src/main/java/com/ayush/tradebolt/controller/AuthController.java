@@ -8,6 +8,7 @@ import com.ayush.tradebolt.response.AuthResponse;
 import com.ayush.tradebolt.service.CustomeUserDetailsService;
 import com.ayush.tradebolt.service.EmailService;
 import com.ayush.tradebolt.service.TwoFactorOtpService;
+import com.ayush.tradebolt.service.WatchlistService;
 import com.ayush.tradebolt.utils.OtpUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpRequest;
@@ -38,6 +39,9 @@ public class AuthController {
     @Autowired
     private EmailService emailService;
 
+    @Autowired
+    private WatchlistService watchlistService;
+
     @PostMapping("/signup")
     public ResponseEntity<AuthResponse> register (@RequestBody User user) throws Exception{      //to register new user in the system
 
@@ -51,6 +55,8 @@ public class AuthController {
         newUser.setEmail(user.getEmail());
         newUser.setFullName(user.getFullName());
         User savedUser =userRepository.save(newUser);
+
+        watchlistService.createWatchlist(savedUser);
 
         Authentication auth = new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword());
         SecurityContextHolder.getContext().setAuthentication(auth);

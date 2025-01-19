@@ -1,5 +1,6 @@
 package com.ayush.tradebolt.controller;
 
+import com.ayush.tradebolt.config.JwtConstant;
 import com.ayush.tradebolt.request.ForgotPasswordTokenRequest;
 import com.ayush.tradebolt.Modal.ForgotPasswordToken;
 import com.ayush.tradebolt.Modal.User;
@@ -36,8 +37,8 @@ public class UserController  {
     private String jwt;
 
 
-    @GetMapping("/api/users")
-    public ResponseEntity<User> getUserProfile(@RequestHeader("Authorization") String jwt) throws Exception {
+    @GetMapping("/api/users/profile")
+    public ResponseEntity<User> getUserProfile(@RequestHeader(JwtConstant.JWT_HEADER) String jwt) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
 
         return new ResponseEntity<User>(user, HttpStatus.OK);
