@@ -20,10 +20,11 @@ public class WalletServiceImpl implements WalletService{
     @Override
     public Wallet getUserWallet(User user) {
 
-        Wallet wallet = WalletRepository.findByUserId(user.getId());
+        Wallet wallet = walletRepository.findByUserId(user.getId());
         if(wallet==null){
            wallet = new Wallet();
            wallet.setUser(user);
+           walletRepository.save(wallet);
         }
         return wallet;
     }

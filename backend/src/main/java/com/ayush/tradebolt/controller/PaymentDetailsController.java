@@ -22,7 +22,7 @@ public class PaymentDetailsController {
     @PostMapping("/payment-details")
     public ResponseEntity<PaymentDetails> addPaymentDetails(
             @RequestBody PaymentDetails paymentDetailsRequest,
-            @RequestHeader("Autjorization") String jwt) throws Exception{
+            @RequestHeader("Authorization") String jwt) throws Exception{
 
         User user = userService.findUserProfileByJwt(jwt);
 
