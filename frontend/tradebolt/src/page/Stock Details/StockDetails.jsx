@@ -14,11 +14,31 @@ import {
   BookmarkIcon,
   DotIcon,
 } from "@radix-ui/react-icons";
-import React from "react";
+import React, { useEffect } from "react";
 import TradingForm from "./TradingForm";
 import StockChart from "../Home/StockChart";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { fetchCoinDetails } from "@/State/Coin/Action";
+import { addItemToWatchlist, getUserWatchlist } from "@/State/Watchlist/Action";
+import { existInWatchlist } from "@/Utils/existInWatchlist";
 
 const StockDetails = () => {
+
+  const {coin, watchlist} = useSelector(store=>store)
+
+  const dispatch = useDispatch();
+  const {id} = useParams();
+
+  useEffect(() => {
+    dispatch(fetchCoinDetails({coinId:id, jwt:localStorage.getItem("jwt")}))
+    dispatch(getUserWatchlist(localStorage.getItem("jwt")))
+  },[id])
+
+  const handleAddToWatchlist = () => {
+    dispatch(addItemToWatchlist({coinId :coin.coinDetails?.id, jwt:localStorage.getItem("jwt")}));
+  }
+
   return (
     <div className="p-5 mt-5">
       <div className="flex justify-between">
@@ -26,31 +46,29 @@ const StockDetails = () => {
           <div>
             <Avatar>
               <AvatarImage
-                src={
-                  "https://assets.coingecko.com/coins/images/1/standard/bitcoin.png?1696501400"
-                }
+                src={coin.coinDetails?.image.large}
               ></AvatarImage>
             </Avatar>
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <p>BTC</p>
+              <p>{coin.coinDetails?.symbol.toUpperCase()}</p>
               <DotIcon className="text-gray-400" />
-              <p className="text-gray-400"> Bitcoin</p>
+              <p className="text-gray-400"> {coin.coinDetails?.name}</p>
             </div>
             <div className="flex items-end gap-2">
-              <p className="text-xl font-bold">$6543</p>
+              <p className="text-xl font-bold">${coin.coinDetails?.market_data.current_price.usd}</p>
               <p className="text-red-600">
-                <span>-131902312.543</span>
-                <span>(-0.29803%)</span>
+                <span>{coin.coinDetails?.market_data.market_cap_change_24h}</span>
+                <span>({coin.coinDetails?.market_data.market_cap_change_percentage_24h}%)</span>
               </p>
             </div>
           </div>
         </div>
 
         <div className="flex items-center gap-4">
-          <Button >
-            {true ? (
+          <Button onClick = {handleAddToWatchlist}>
+            { existInWatchlist(watchlist.items, coin.coinDetails) ? (
               <BookmarkFilledIcon className="h-6 w-6" />
             ) : (
               <BookmarkIcon className="h-6 w-6" />
@@ -70,7 +88,7 @@ const StockDetails = () => {
         </div>
       </div>
       <div className="mt-14">
-        <StockChart/>
+        <StockChart coinId={id}/>
       </div>
     </div>
   );
