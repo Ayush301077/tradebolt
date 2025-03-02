@@ -15,6 +15,9 @@ public class Asset {
     private double buyPrice;
 
     @ManyToOne
+    private User user;
+
+    @ManyToOne
     private Coin coin;
 
     public Long getId() {
@@ -57,6 +60,5 @@ public class Asset {
         this.user = user;
     }
 
-    @ManyToOne
-    private User user;
+
 }

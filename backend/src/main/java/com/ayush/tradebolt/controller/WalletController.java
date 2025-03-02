@@ -1,11 +1,104 @@
+//package com.ayush.tradebolt.controller;
+//
+//import com.ayush.tradebolt.Modal.*;
+//import com.ayush.tradebolt.response.PaymentResponse;
+//import com.ayush.tradebolt.service.*;
+//import org.springframework.beans.factory.annotation.Autowired;
+//import org.springframework.http.HttpStatus;
+//import org.springframework.http.ResponseEntity;
+//import org.springframework.web.bind.annotation.*;
+//
+//import java.math.BigDecimal;
+//
+//@RestController
+//public class WalletController {
+//
+//    @Autowired
+//    private WalletService walletService;
+//
+//    @Autowired
+//    private UserService userService;
+//
+//    @Autowired
+//    private OrderService orderService;
+//
+//    @Autowired
+//    private PaymentService paymentService;
+//
+//    @Autowired
+//    private TransactionService transactionService;
+//
+//    @GetMapping("/api/wallet")
+//    public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
+//        User user = userService.findUserProfileByJwt(jwt);
+//
+//        Wallet wallet = walletService.getUserWallet(user);
+//
+//        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+//    }
+//
+//    @PutMapping("/api/wallet/{walletId}/transfer")
+//    public ResponseEntity<Wallet> walletToWalletTransfer(
+//            @RequestHeader("Authorization") String jwt,
+//            @PathVariable Long walletId,
+//            @RequestBody WalletTransaction req
+//            ) throws Exception{
+//        User senderUser = userService.findUserProfileByJwt(jwt);
+//        Wallet receiverWallet = walletService.findWalletById(walletId);
+//        Wallet wallet = walletService.walletToWalletTransfer(senderUser, receiverWallet, req.getAmount());
+//
+//
+//        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+//    }
+//
+//    @PutMapping("/api/wallet/order/{orderId}/pay")
+//    public ResponseEntity<Wallet> payOrderPayment(
+//            @RequestHeader("Authorization") String jwt,
+//            @PathVariable Long orderId
+//    ) throws Exception{
+//
+//        User user = userService.findUserProfileByJwt(jwt);
+//
+//        Order order = orderService.getOrderById(orderId);
+//
+//        Wallet wallet = walletService.payOrderPayment(order, user);
+//
+//
+//        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+//    }
+//
+//    @PutMapping("/api/wallet/deposit")
+//    public ResponseEntity<Wallet> addBalanceToWallet(
+//            @RequestHeader("Authorization") String jwt,
+//            @RequestParam(name = "order_id") Long orderId,
+//            @RequestParam(name = "payment_id") String paymentId
+//    ) throws Exception{
+//
+//        User user = userService.findUserProfileByJwt(jwt);
+//
+//        Wallet wallet = walletService.getUserWallet(user);
+//
+//        PaymentOrder order = paymentService.getPaymentOrderById(orderId);
+//
+//        Boolean status = paymentService.proceedPaymentOrder(order, paymentId);
+//
+//        if (wallet.getBalance()==null)
+//        {
+//            wallet.setBalance(BigDecimal.valueOf(0));
+//        }
+//
+//        if(status){
+//            wallet = walletService.addBalance(wallet, order.getAmount());
+//        }
+//
+//        return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
+//    }
+//}
 package com.ayush.tradebolt.controller;
 
 import com.ayush.tradebolt.Modal.*;
-import com.ayush.tradebolt.response.PaymentResponse;
-import com.ayush.tradebolt.service.OrderService;
-import com.ayush.tradebolt.service.PaymentService;
-import com.ayush.tradebolt.service.UserService;
-import com.ayush.tradebolt.service.WalletService;
+import com.ayush.tradebolt.domain.WalletTransactionType;
+import com.ayush.tradebolt.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +121,13 @@ public class WalletController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private TransactionService transactionService;
+
     @GetMapping("/api/wallet")
     public ResponseEntity<Wallet> getUserWallet(@RequestHeader("Authorization") String jwt) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
-
         Wallet wallet = walletService.getUserWallet(user);
-
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
     }
 
@@ -42,10 +136,13 @@ public class WalletController {
             @RequestHeader("Authorization") String jwt,
             @PathVariable Long walletId,
             @RequestBody WalletTransaction req
-            ) throws Exception{
+    ) throws Exception {
         User senderUser = userService.findUserProfileByJwt(jwt);
         Wallet receiverWallet = walletService.findWalletById(walletId);
         Wallet wallet = walletService.walletToWalletTransfer(senderUser, receiverWallet, req.getAmount());
+
+        // Create a transaction record
+        transactionService.createTransaction(wallet, WalletTransactionType.WALLET_TRANSFER, receiverWallet.getId(), req.getPurpose(), req.getAmount());
 
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
     }
@@ -54,15 +151,10 @@ public class WalletController {
     public ResponseEntity<Wallet> payOrderPayment(
             @RequestHeader("Authorization") String jwt,
             @PathVariable Long orderId
-    ) throws Exception{
-
+    ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
-
         Order order = orderService.getOrderById(orderId);
-
         Wallet wallet = walletService.payOrderPayment(order, user);
-
-
         return new ResponseEntity<>(wallet, HttpStatus.ACCEPTED);
     }
 
@@ -71,22 +163,17 @@ public class WalletController {
             @RequestHeader("Authorization") String jwt,
             @RequestParam(name = "order_id") Long orderId,
             @RequestParam(name = "payment_id") String paymentId
-    ) throws Exception{
-
+    ) throws Exception {
         User user = userService.findUserProfileByJwt(jwt);
-
         Wallet wallet = walletService.getUserWallet(user);
-
         PaymentOrder order = paymentService.getPaymentOrderById(orderId);
-
         Boolean status = paymentService.proceedPaymentOrder(order, paymentId);
 
-        if (wallet.getBalance()==null)
-        {
+        if (wallet.getBalance() == null) {
             wallet.setBalance(BigDecimal.valueOf(0));
         }
 
-        if(status){
+        if (status) {
             wallet = walletService.addBalance(wallet, order.getAmount());
         }
 

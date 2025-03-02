@@ -12,6 +12,18 @@ public class PaymentDetails {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    private String accountNumber;
+
+    private String accountHolderName;
+
+    private String ifsc;
+
+    private String bankName;
+
+    @OneToOne
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private User user;
+
     public Long getId() {
         return id;
     }
@@ -60,15 +72,5 @@ public class PaymentDetails {
         this.user = user;
     }
 
-    private String accountNumber;
 
-    private String accountHolderName;
-
-    private String ifsc;
-
-    private String bankName;
-
-    @OneToOne
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private User user;
 }

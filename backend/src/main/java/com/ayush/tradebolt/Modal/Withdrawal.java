@@ -10,6 +10,21 @@ import java.util.Date;
 @Data
 @Entity
 public class Withdrawal {
+
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    private WithdrawalStatus status;
+
+    private Long amount;
+
+    @ManyToOne
+    private User user;
+
+    private LocalDateTime date= LocalDateTime.now();
+
     public Long getId() {
         return id;
     }
@@ -49,18 +64,5 @@ public class Withdrawal {
     public void setDate(LocalDateTime date) {
         this.date = date;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
-
-    private WithdrawalStatus status;
-
-    private Long amount;
-
-    @ManyToOne
-    private User user;
-
-    private LocalDateTime date= LocalDateTime.now();
 
 }

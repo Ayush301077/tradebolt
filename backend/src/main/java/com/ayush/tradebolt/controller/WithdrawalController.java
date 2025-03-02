@@ -2,7 +2,10 @@ package com.ayush.tradebolt.controller;
 
 import com.ayush.tradebolt.Modal.User;
 import com.ayush.tradebolt.Modal.Wallet;
+import com.ayush.tradebolt.Modal.WalletTransaction;
 import com.ayush.tradebolt.Modal.Withdrawal;
+import com.ayush.tradebolt.domain.WalletTransactionType;
+import com.ayush.tradebolt.service.TransactionService;
 import com.ayush.tradebolt.service.UserService;
 import com.ayush.tradebolt.service.WalletService;
 import com.ayush.tradebolt.service.WithdrawalService;
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/withdrawal")
 public class WithdrawalController {
 
     @Autowired
@@ -26,6 +28,10 @@ public class WithdrawalController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private TransactionService transactionService;
+
+
     @PostMapping("/api/withdrawal/{amount}")
     public ResponseEntity<?> withdrawalRequest(
             @PathVariable Long amount,
@@ -35,6 +41,14 @@ public class WithdrawalController {
 
         Withdrawal withdrawal = withdrawalService.requestWithdrawal(amount, user);
         walletService.addBalance(userWallet, -withdrawal.getAmount());
+
+        WalletTransaction walletTransaction = transactionService.createTransaction(
+                userWallet,
+                WalletTransactionType.WITHDRAWAL,
+                null,
+                "bank account withdrawal",
+                withdrawal.getAmount()
+        );
 
         return new ResponseEntity<>(withdrawal, HttpStatus.OK);
     }

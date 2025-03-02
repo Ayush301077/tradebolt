@@ -21,7 +21,7 @@ public class Order {
     @Column(nullable = false)
     private OrderType orderType;
 
-    @OneToOne(mappedBy = "order")
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
     private OrderItem orderItem;
 
     @Column(nullable = false)
