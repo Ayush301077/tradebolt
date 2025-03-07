@@ -4,18 +4,19 @@ import { data } from "react-router-dom";
 import api, { API_BASE_URL } from "@/config/api";
 
 export const getCoinList = (page) => async (dispatch) => {
-    dispatch({ type: FETCH_COIN_LIST_REQUEST })
-    const baseUrl = "http://localhost:5454"
-  
+    dispatch({ type: FETCH_COIN_LIST_REQUEST });
+    const baseUrl = "http://localhost:5454";
+
     try {
-      const {data} = await axios.get(`${baseUrl}/coins?page=${page}`);
-      console.log("coin list", data);
-      dispatch({ type: FETCH_COIN_LIST_SUCCESS, payload: data })
+        const { data } = await axios.get(`${baseUrl}/coins?page=${page}`);
+        console.log("coin list", data);
+        dispatch({ type: FETCH_COIN_LIST_SUCCESS, payload: data });
     } catch (error) {
-      dispatch({ type: FETCH_COIN_LIST_FAILURE, payload: error.message })
-      console.log(error);
+        dispatch({ type: FETCH_COIN_LIST_FAILURE, payload: error.message });
+        console.log(error);
     }
-  }
+};
+
 export const getTop50CoinList = () => async (dispatch) => {
     dispatch({ type: FETCH_TOP_50_COINS_REQUEST })
   
