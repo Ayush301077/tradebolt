@@ -16,8 +16,10 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpHeaders;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service
 public class CoinServiceImpl implements CoinService {
@@ -29,6 +31,7 @@ public class CoinServiceImpl implements CoinService {
     private ObjectMapper objectMapper;
 
     @Override
+    @Cacheable(value = "coinList", key = "#page")
     public List<Coin> getCoinList(int page) throws Exception {
         String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10&page="+page;
         RestTemplate restTemplate = new RestTemplate();
@@ -51,6 +54,7 @@ public class CoinServiceImpl implements CoinService {
     }
 
     @Override
+    @Cacheable(value = "marketChart", key = "#coinId + '_' + #days")
     public String getMarketChart(String coinId, int days) throws Exception {
 //        String url = "https://api.coingecko.com/api/v3/coins/"+coinId+"market_chart?vs_currency=usd&days="+days;
         String url = "https://api.coingecko.com/api/v3/coins/" + coinId + "/market_chart?vs_currency=usd&days="+days;
@@ -73,6 +77,7 @@ public class CoinServiceImpl implements CoinService {
 
 
     @Override
+    @Cacheable(value = "coinDetails", key = "#coinId")
     public String getCoinDetails(String coinId) throws Exception {
         String url = "https://api.coingecko.com/api/v3/coins/"+coinId;
         RestTemplate restTemplate = new RestTemplate();
@@ -121,6 +126,7 @@ public class CoinServiceImpl implements CoinService {
 
 
     @Override
+    @Cacheable(value = "coinById", key = "#coinId")
     public Coin findById(String coinId) throws Exception {
 
         Optional<Coin> optionalCoin = coinRepository.findById(coinId);
@@ -130,6 +136,7 @@ public class CoinServiceImpl implements CoinService {
     }
 
     @Override
+    @Cacheable(value = "searchCoin", key = "#keyword")
     public String searchCoin(String keyword) throws Exception {
         String url = "https://api.coingecko.com/api/v3/search?query="+keyword;
         RestTemplate restTemplate = new RestTemplate();
@@ -149,27 +156,51 @@ public class CoinServiceImpl implements CoinService {
         }
     }
 
+//    @Override
+//    @Cacheable(value = "top50Coins")
+//    public String getTop50CoinsByMarketCapRank() throws Exception {
+//        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=50&page=1";
+//        RestTemplate restTemplate = new RestTemplate();
+//
+//        try{
+//            HttpHeaders headers = new HttpHeaders();
+//
+//            HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+//
+//            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+//
+//            return response.getBody();
+//        }
+//
+//        catch (HttpClientErrorException | HttpServerErrorException e){
+//            throw new Exception(e.getMessage());
+//        }
+//    }
+
     @Override
+    @Cacheable(value = "top50Coins")
     public String getTop50CoinsByMarketCapRank() throws Exception {
-        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=50&page=1";
+        String url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false";
         RestTemplate restTemplate = new RestTemplate();
 
-        try{
+        try {
             HttpHeaders headers = new HttpHeaders();
-
             HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
 
-            return response.getBody();
-        }
+            // Parse the response and sort by 24-hour price change percentage
+            List<Coin> coins = objectMapper.readValue(response.getBody(), new TypeReference<List<Coin>>() {});
+            coins.sort(Comparator.comparingDouble(Coin::getPriceChangePercentage24h).reversed());
 
-        catch (HttpClientErrorException | HttpServerErrorException e){
+            return objectMapper.writeValueAsString(coins);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
             throw new Exception(e.getMessage());
         }
     }
 
+
     @Override
+    @Cacheable(value = "trendingCoins")
     public String getTreadingCoins() throws Exception {
         String url = "https://api.coingecko.com/api/v3/search/trending";
         RestTemplate restTemplate = new RestTemplate();

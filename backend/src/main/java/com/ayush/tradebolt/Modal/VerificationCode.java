@@ -14,6 +14,13 @@ public class VerificationCode {
 
     private String otp;
 
+    @OneToOne
+    private User user;
+
+    private String email;
+    private String mobile;
+    private VerificationType verificationType;
+
     public Long getId() {
         return id;
     }
@@ -62,11 +69,6 @@ public class VerificationCode {
         this.verificationType = verificationType;
     }
 
-    @OneToOne
-    private User user;
 
-    private String email;
-    private String mobile;
-    private VerificationType verificationType;
 
 }
