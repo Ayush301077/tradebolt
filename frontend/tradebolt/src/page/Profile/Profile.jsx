@@ -71,7 +71,7 @@ const Profile = () => {
             </div>
           </CardContent>
         </Card>
-        <div className="mt-6">
+        {/* <div className="mt-6">
           <Card className="w-full">
             <CardHeader className="pb-7">
               <div className="flex items-center gap-3">
@@ -103,7 +103,7 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -22,8 +22,10 @@ const Activity = () => {
 
   useEffect(() => {
     dispatch(getAllOrdersForUser({jwt :localStorage.getItem("jwt")}));
+    console.log(order)
   },[])
 
+  
   return (
     <div className="p-5 lg:px-20">
       <h1 className="font-bold text-3xl pb-5">Activity</h1>
@@ -43,8 +45,8 @@ const Activity = () => {
           {order.orders.map((item, index) => (
             <TableRow key={index}>
               <TableCell>
-                <p>2024/05/31</p>
-                <p className="text-gray-400">12:39:32</p>
+                <p>{item.timestamp ? new Date(item.timestamp).toLocaleDateString() : 'N/A'}</p>
+                <p className="text-gray-400">{item.timestamp ? new Date(item.timestamp).toLocaleTimeString() : 'N/A'}</p>
               </TableCell>
               <TableCell className="font-medium flex items-center gap-2">
                 <Avatar className="-z-50">
@@ -55,7 +57,7 @@ const Activity = () => {
               <TableCell>{item.orderItem.buyPrice}</TableCell>
               <TableCell>{item.orderItem.sellPrice}</TableCell>
               <TableCell>{item.orderType}</TableCell>
-              <TableCell className="">${calculateProfit(item)}</TableCell>
+              <TableCell className="">{calculateProfit(item)}</TableCell>
               <TableCell className="text-right">{item.price}</TableCell>
             </TableRow>
           ))}

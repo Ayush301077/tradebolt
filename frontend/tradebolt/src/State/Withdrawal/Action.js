@@ -43,9 +43,31 @@ export const proceedWithdrawal = ({id, jwt, accept}) => async(dispatch) => {
     }
 };
 
+// export const getWithdrawalHistory = (jwt) => async(dispatch) => {
+//     dispatch({type: GET_WITHDRAWAL_HISTORY_REQUEST});
+//     console.log("JWT Token:", jwt); 
+//     try{
+//         const response = await api.get(`/api/withdrawal`, {
+//             headers: {
+//                 Authorization: `Bearer ${jwt}`,
+//             },
+//         });
+
+//         console.log("withdrawal history -------",response.data);
+
+//         dispatch({
+//             type:GET_WITHDRAWAL_HISTORY_SUCCESS, payload: response.data,
+//         });
+//     }
+//     catch(error){
+//         console.log(error);
+//         dispatch({type: GET_WITHDRAWAL_HISTORY_FAILURE, payload:error.message,});
+//     }
+// };
+
 export const getWithdrawalHistory = (jwt) => async(dispatch) => {
     dispatch({type: GET_WITHDRAWAL_HISTORY_REQUEST});
-    console.log("JWT Token:", jwt); 
+    console.log("JWT Token:", jwt);
     try{
         const response = await api.get(`/api/withdrawal`, {
             headers: {
@@ -53,17 +75,18 @@ export const getWithdrawalHistory = (jwt) => async(dispatch) => {
             },
         });
 
-        console.log("withdrawal history -------",response.data);
+        console.log("withdrawal history -------", response.data);
 
         dispatch({
-            type:GET_WITHDRAWAL_HISTORY_SUCCESS, payload: response.data,
+            type: GET_WITHDRAWAL_HISTORY_SUCCESS, payload: response.data,
         });
     }
     catch(error){
         console.log(error);
-        dispatch({type: GET_WITHDRAWAL_HISTORY_FAILURE, payload:error.message,});
+        dispatch({type: GET_WITHDRAWAL_HISTORY_FAILURE, payload: error.message,});
     }
 };
+
 
 export const getAllWithdrawalRequest = jwt => async(dispatch) => {
     dispatch({type: GET_WITHDRAWAL_REQUEST_REQUEST});

@@ -22,7 +22,8 @@ public class WithdrawalServiceImpl implements WithdrawalService{
         Withdrawal withdrawal= new Withdrawal();
         withdrawal.setAmount(amount);
         withdrawal.setUser(user);
-        withdrawal.setStatus(WithdrawalStatus.PENDING);
+        withdrawal.setDate(LocalDateTime.now());
+        withdrawal.setStatus(WithdrawalStatus.SUCCESS);
         return withdrawalRepository.save(withdrawal);
     }
 
@@ -35,7 +36,6 @@ public class WithdrawalServiceImpl implements WithdrawalService{
         Withdrawal withdrawal1 = withdrawal.get();
 
         withdrawal1.setDate(LocalDateTime.now());
-
         if(accept){
             withdrawal1.setStatus(WithdrawalStatus.SUCCESS);
         }

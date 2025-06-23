@@ -46,7 +46,7 @@ const StockDetails = () => {
           <div>
             <Avatar>
               <AvatarImage
-                src={coin.coinDetails?.image.large}
+                src={coin.coinDetails?.image}
               ></AvatarImage>
             </Avatar>
           </div>

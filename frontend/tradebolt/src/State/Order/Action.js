@@ -56,7 +56,7 @@ export const payOrder=
     dispatch({ type: GET_ALL_ORDERS_REQUEST });
 
     try {
-      const response = await api.post(`/api/orders`, {
+      const response = await api.get('/api/orders', {
         headers: {
             Authorization: `Bearer ${jwt}`
         },
